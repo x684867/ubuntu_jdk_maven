@@ -1,0 +1,60 @@
+#!/bin/bash -e
+#
+# installJdk
+# (c) 2014 Sam Caldwell.  Public Domain.
+# 
+# This script installs JDK 7.  Don't tell
+# anyone I'm degrading myself with Java.
+#
+JAVA_URL=https://s3.amazonaws.com/edgecase-ops/software/jdk-7u72-linux-x64.gz
+
+JAVA_TMP=/root/jdk
+JAVA_BIN=/usr/bin/java
+INSTALL_DIR=/usr/local/java
+
+JAVA_TARBALL=${JAVA_TMP}/jdk.tar.gz
+export JAVA_HOME=${INSTALL_DIR}/current/
+
+echo "creating temporary directory ${JAVA_TMP}"
+mkdir -p ${JAVA_TMP} || exit 1
+
+echo "navigaing into ${JAVA_TMP}"
+cd ${JAVA_TMP} || exit 1
+
+echo "downloading $JAVA_TARBALL from $JAVA_URL"
+wget -O ${JAVA_TARBALL} ${JAVA_URL} || exit 1
+
+echo "Creating INSTALL_DIR: ${INSTALL_DIR}"
+mkdir -p ${INSTALL_DIR} || exit 1
+
+echo "Extracting JAVA_TARBALL: ${JAVA_TARBALL} to ${JAVA_TMP}"
+tar -xvzf $JAVA_TARBALL -C ${JAVA_TMP}/ || exit 1
+
+echo "Identifying JAVA_DIR..."
+JAVA_DIR=${JAVA_PRODUCT}/$(ls jre/ | tail -n1)
+echo "JAVA_DIR is identified as ${JAVA_DIR}"
+
+echo "Moving JAVA_DIR to INSTALL DIR [from: $JAVA_DIR  | to: $INSTALL_DIR]"
+mv ${JAVA_DIR} $INSTALL_DIR/ || exit 1
+
+echo "Create symlink to current version directory ${INSTALL_DIR}/current"
+ln -sf ${INSTALL_DIR}/${JAVA_DIR} ${INSTALL_DIR}/current || exit 1
+
+echo "SYMLINK current java binary to ${JAVA_BIN}"
+ln -sf ${INSTALL_DIR}/current/bin/java ${JAVA_BIN} || exit 1
+
+echo "Update PATH"
+PATH=$PATH:${JAVA_HOME}
+
+echo "cleaning up."
+cd /root/
+rm -rf /root/java || exit 1
+
+echo "testing jre"
+java -version || exit 1
+
+echo "testing jdk"
+javac -version || exit 1
+
+echo "SUCCESS"
+exit 0

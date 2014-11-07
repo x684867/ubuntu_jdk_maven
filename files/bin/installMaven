@@ -1,0 +1,31 @@
+#!/bin/bash -e
+#
+# installMaven
+# (c) 2014 Sam Caldwell.  Public Domain.
+# 
+# This script installs Maven 3.2.1.  Don't tell
+# anyone I'm degrading myself with Java.
+#
+URL=http://mirror.cogentco.com/pub/apache/maven/maven-3/3.2.3/binaries/apache-maven-3.2.3-bin.tar.gz
+TMPDIR=/root/maven
+BINDIR=/usr/local/maven
+TARBALL=maven.tar.gz
+
+mkdir -p $TMPDIR || exit 1
+cd $TMPDIR
+wget -O $TARBALL $URL || exit 1
+tar -xvzf $TARBALL || exit 1
+
+echo "removing $TARBALL"
+rm -rf $TARBALL || exit 1
+
+echo "moving maven to $BINDIR"
+mv $(ls | head -n1) $BINDIR || exit 1
+export PATH=$PATH:$BINDIR/bin/
+
+echo "testing maven version..."
+maven --version || exit 1
+echo "SUCCESS"
+exit 0
+
+

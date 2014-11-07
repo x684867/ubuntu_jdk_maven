@@ -1,0 +1,19 @@
+#DockerFile (ubuntu_jdk_maven)
+#
+# (c) Sam Caldwell.  Public Domain.
+#
+# This docker container creates an Ubuntu server
+# with JDK (7:latest) and Maven (3.2.1).  
+#
+# 'cause sometimes you just want to slum with Java.
+#
+FROM x684867/ubuntucore14.04
+MAINTAINER Sam Caldwell <sam@edgecase.io>
+
+ADD files/installJavaRe /usr/bin/
+ADD files/installMaven /usr/bin/
+
+RUN /usr/bin/installJdk
+RUN /usr/bin/installMaven
+
+CMD["/bin/bash"]
